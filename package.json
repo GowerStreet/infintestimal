@@ -1,0 +1,34 @@
+{
+  "name": "@gowerstreet/infintestimal",
+  "version": "1.0.0",
+  "description": "A minimal predicate-based testing library for Sibilant",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx sibilant -x test.sibilant",
+    "compile": "npx sibilant --file infintestimal.sibilant >index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GowerStreet/infintestimal.git"
+  },
+  "keywords": [
+    "minimal",
+    "predicate",
+    "testing",
+    "library",
+    "tdd",
+    "unit",
+    "test",
+    "sibilant",
+    "sibilantjs"
+  ],
+  "author": "sleepyfox@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GowerStreet/infintestimal/issues"
+  },
+  "homepage": "https://github.com/GowerStreet/infintestimal#readme",
+  "devDependencies": {
+    "sibilant": "0.5.x"
+  }
+}

@@ -1,0 +1,57 @@
+(var assert (require 'assert)
+     OK "\033[32m\u2714\033[0m"
+     FAIL "\033[31m\u2718\033[0m")
+
+(def arrays-equal? (expected actual)
+     (and (array? expected)
+          (array? actual)
+          (try (do (assert.deep-equal expected actual)
+                   true)
+               false)))
+
+(def objects-equal? (expected actual)
+  (and (object? actual)
+       (object? expected)
+       (try (do (assert.deep-equal expected actual)
+                true)
+            false)))
+
+;; Runs a test
+;; Each test is a tuple of name, fn
+;; Returns a text string with OK or FAIL + comment
+(def is (expected actual)
+  (if (array? actual)
+      (if (arrays-equal? expected actual)
+          OK
+          (+ FAIL "\n  expected " (JSON.stringify expected)
+             " but got " (JSON.stringify actual)))
+      (object? actual)
+      (if (objects-equal? expected actual)
+          OK
+          (+ FAIL "\n  expected " (JSON.stringify expected null 2)
+             "\nbut got " (JSON.stringify actual null 2)))
+      (if (= expected actual)
+          OK
+          (+ FAIL "\n  expected " expected " but got " actual))))
+
+;; If the test result is OK, then count it as passed
+(def count-passed (acc x)
+  (if (= (.substr (second x) 0 10) OK)
+    (+ 1 acc)
+    acc))
+
+;; Runs the tests and reports the results
+(def test-runner (tests)
+  (console.log "Running tests... \n")
+  (var results (.map tests
+                     (# (t) [(first t) ((second t))])))
+  (each r results (console.log (first r) (second r)))
+  (var succeeded (.reduce results count-passed 0)
+       failed (- (length results) succeeded))
+  (console.log (+ "\n" succeeded " tests passed, " failed " failed")))
+
+(set module 'exports (hash 'is is
+                           'OK OK
+                           'arrays-equal? arrays-equal?
+                           'objects-equal? objects-equal?
+                           'test-runner test-runner))
