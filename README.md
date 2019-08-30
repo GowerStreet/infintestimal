@@ -11,7 +11,7 @@ If you agree with this viewpoint, you might think it would be nice to have a tes
 This is what Infintestimal does. It is written in Sibilant, a LISP that is a very shallow transformation to readable JavaScript, but the code is useable from plain old JS, like so [example-test.js](example-test.js):
 
 ```javascript
-var {is, testRunner} = require('infintestimal')
+var {is, testRunner} = require('@gowerstreet/infintestimal')
 
 var exampleSuite = [["This is a test that passes",
                      () => is(1, 1)],
