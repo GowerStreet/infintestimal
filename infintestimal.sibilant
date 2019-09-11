@@ -1,4 +1,5 @@
 (var assert (require 'assert)
+     async (require 'async)
      OK "\033[32m\u2714\033[0m"
      FAIL "\033[31m\u2718\033[0m")
 
@@ -36,19 +37,41 @@
 
 ;; If the test result is OK, then count it as passed
 (def count-passed (acc x)
-  (if (= (.substr (second x) 0 10) OK)
+  (if (= (.substr x 0 10) OK)
     (+ 1 acc)
     acc))
+
+(def zip (a b)
+  ;; zips two arrays together
+  ;; (zip [1 2] [a b]) -> [[1 a] [2 b]]
+  (a.map (# (item index) [item (get b index)])))
+
+(def wrap-if-sync (f)
+  (if (= 0 (length f))
+    ;; If function is syncronous (thunk), wrap in a callback
+    (# (cb) (cb null (f)))
+    ;; else just return it
+    (# (cb) (f (# (results) (cb null results))))))
 
 ;; Runs the tests and reports the results
 (def test-runner (tests)
   (console.log "Running tests... \n")
-  (var results (.map tests
-                     (# (t) [(first t) ((second t))])))
-  (each r results (console.log (first r) (second r)))
-  (var succeeded (.reduce results count-passed 0)
-       failed (- (length results) succeeded))
-  (console.log (+ "\n" succeeded " tests passed, " failed " failed")))
+  (var test-fns (tests.map (# (x) (wrap-if-sync (second x))))
+       test-names (tests.map (# (x) (first x))))
+  (async.parallel test-fns (# (err results)
+     (if err
+       (console.log "Error:" err)
+       ;; Zip results and test names
+       (do
+         (pipe results
+               (zip test-names)
+               (.map (# (x) (+ (first x) " " (second x))))
+               (.map (# (x) (console.log x))))
+         (var succeeded (.reduce results count-passed 0)
+              failed (- (length results) succeeded))
+         (console.log "first result" (get results 0))
+         (console.log (+ "\n" succeeded " tests passed, " failed " failed")))))))
+
 
 (set module 'exports (hash 'is is
                            'OK OK

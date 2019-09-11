@@ -30,5 +30,8 @@
   "homepage": "https://github.com/GowerStreet/infintestimal#readme",
   "devDependencies": {
     "sibilant": "0.5.x"
+  },
+  "dependencies": {
+    "async": "^3.1.0"
   }
 }

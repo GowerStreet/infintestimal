@@ -24,6 +24,14 @@
      is-tests [["Is can compare arrays"
                 (#> (is [1 2] [1 2]))]
                ["Is can compare objects"
-                (#> (is {'a 1} {'a 1}))]])
+                (#> (is {'a 1} {'a 1}))]]
+     async-test [["We can test things that don't immediately return"
+                  (# (done)
+                     (var expected "cat")
+                     (set-timeout (#> (done (is expected 'cat))) 1000))]
+                 ["We can test other things, which won't slow each other down"
+                  (# (done)
+                     (var expected 1)
+                     (set-timeout (#> (done (is expected 1))) 100))]])
 
-(each test [arrays objects is-tests] (test-runner test))
+(each test [arrays objects is-tests async-test] (test-runner test))

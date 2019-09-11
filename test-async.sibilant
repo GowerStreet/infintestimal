@@ -1,0 +1,9 @@
+(var async (require 'async))
+
+(def w1 (d) (set-timeout (#> (d null 1)) 1000))
+(def w2 (d) (set-timeout (#> (d null 2)) 2000))
+
+;; (w1 console.log)
+;; (w2 console.log)
+
+(async.parallel [w1 w2] (# (e r) (console.log "e" e "r" r)))

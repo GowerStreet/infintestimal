@@ -1,8 +1,9 @@
 var assert = require("assert"),
+    async = require("async"),
     OK = "\033[32m\u2714\033[0m",
     FAIL = "\033[31m\u2718\033[0m";
 var arraysEqual__QUERY = (function arraysEqual__QUERY$(expected, actual) {
-  /* arrays-equal? infintestimal.sibilant:5:0 */
+  /* arrays-equal? infintestimal.sibilant:6:0 */
 
   return ((expected && "object" === typeof expected && "Array" === expected.constructor.name) && (actual && "object" === typeof actual && "Array" === actual.constructor.name) && (function() {
     try {
@@ -14,7 +15,7 @@ var arraysEqual__QUERY = (function arraysEqual__QUERY$(expected, actual) {
   }).call(this));
 });
 var objectsEqual__QUERY = (function objectsEqual__QUERY$(expected, actual) {
-  /* objects-equal? infintestimal.sibilant:12:0 */
+  /* objects-equal? infintestimal.sibilant:13:0 */
 
   return (("object" === typeof actual && actual !== null && actual.constructor.name !== "Array") && ("object" === typeof expected && expected !== null && expected.constructor.name !== "Array") && (function() {
     try {
@@ -26,7 +27,7 @@ var objectsEqual__QUERY = (function objectsEqual__QUERY$(expected, actual) {
   }).call(this));
 });
 var is = (function is$(expected, actual) {
-  /* is infintestimal.sibilant:22:0 */
+  /* is infintestimal.sibilant:23:0 */
 
   return (function() {
     if ((actual && "object" === typeof actual && "Array" === actual.constructor.name)) {
@@ -57,33 +58,85 @@ var is = (function is$(expected, actual) {
   }).call(this);
 });
 var countPassed = (function countPassed$(acc, x) {
-  /* count-passed infintestimal.sibilant:38:0 */
+  /* count-passed infintestimal.sibilant:39:0 */
 
   return (function() {
-    if (x[1].substr(0, 10) === OK) {
+    if (x.substr(0, 10) === OK) {
       return (1 + acc);
     } else {
       return acc;
     }
   }).call(this);
 });
+var zip = (function zip$(a, b) {
+  /* zip infintestimal.sibilant:44:0 */
+
+  return a.map((function(item, index) {
+    /* infintestimal.sibilant:47:9 */
+
+    return [ item, b[index] ];
+  }));
+});
+var wrapIfSync = (function wrapIfSync$(f) {
+  /* wrap-if-sync infintestimal.sibilant:49:0 */
+
+  return (function() {
+    if (0 === f.length) {
+      return (function(cb) {
+        /* infintestimal.sibilant:52:4 */
+
+        return cb(null, f());
+      });
+    } else {
+      return (function(cb) {
+        /* infintestimal.sibilant:54:4 */
+
+        return f((function(results) {
+          /* infintestimal.sibilant:54:15 */
+
+          return cb(null, results);
+        }));
+      });
+    }
+  }).call(this);
+});
 var testRunner = (function testRunner$(tests) {
-  /* test-runner infintestimal.sibilant:44:0 */
+  /* test-runner infintestimal.sibilant:57:0 */
 
   console.log("Running tests... \n");
-  var results = tests.map((function(t) {
-    /* infintestimal.sibilant:47:21 */
-  
-    return [ t[0], t[1]() ];
+  var testFns = tests.map((function(x) {
+    /* infintestimal.sibilant:59:27 */
+
+    return wrapIfSync(x[1]);
+  })),
+      testNames = tests.map((function(x) {
+    /* infintestimal.sibilant:60:29 */
+
+    return x[0];
   }));
-  results.forEach((function(r) {
-    /* infintestimal.sibilant:48:2 */
-  
-    return console.log(r[0], r[1]);
+  return async.parallel(testFns, (function(err, results) {
+    /* infintestimal.sibilant:61:27 */
+
+    return (function() {
+      if (err) {
+        return console.log("Error:", err);
+      } else {
+        zip(results, testNames).map((function(x) {
+          /* infintestimal.sibilant:68:21 */
+
+          return (x[0] + " " + x[1]);
+        })).map((function(x) {
+          /* infintestimal.sibilant:69:21 */
+
+          return console.log(x);
+        }));
+        var succeeded = results.reduce(countPassed, 0),
+            failed = (results.length - succeeded);
+        console.log("first result", results[0]);
+        return console.log(("\n" + succeeded + " tests passed, " + failed + " failed"));
+      }
+    }).call(this);
   }));
-  var succeeded = results.reduce(countPassed, 0),
-      failed = (results.length - succeeded);
-  return console.log(("\n" + succeeded + " tests passed, " + failed + " failed"));
 });
 module.exports = {
   "is": is,
