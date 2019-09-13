@@ -36,8 +36,12 @@
           (+ FAIL "\n  expected " expected " but got " actual))))
 
 ;; If the test result is OK, then count it as passed
+(def passed? (x)
+  (= (.substr x 0 10) OK))
+
+;; Count up all the passing tests
 (def count-passed (acc x)
-  (if (= (.substr x 0 10) OK)
+  (if (passed? x)
     (+ 1 acc)
     acc))
 
@@ -53,7 +57,13 @@
     ;; else just return it
     (# (cb) (f (# (results) (cb null results))))))
 
+(def reporter (test-result)
+  (if (passed? (first test-result))
+    (console.log (+ (first test-result) " " (second test-result)))
+    (console.log (+ (.substr (first test-result) 0 10) " " (second test-result) (.substr (first test-result) 10)))))
+
 ;; Runs the tests and reports the results
+;; TODO: take multiple test suite args, run them all and report aggregate pass/fail stats
 (def test-runner (tests)
   (console.log "Running tests... \n")
   (var test-fns (tests.map (# (x) (wrap-if-sync (second x))))
@@ -65,11 +75,9 @@
        (do
          (pipe results
                (zip test-names)
-               (.map (# (x) (+ (first x) " " (second x))))
-               (.map (# (x) (console.log x))))
+               (.map reporter))
          (var succeeded (.reduce results count-passed 0)
               failed (- (length results) succeeded))
-         (console.log "first result" (get results 0))
          (console.log (+ "\n" succeeded " tests passed, " failed " failed")))))))
 
 

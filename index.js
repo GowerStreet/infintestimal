@@ -57,11 +57,16 @@ var is = (function is$(expected, actual) {
     }
   }).call(this);
 });
+var passed__QUERY = (function passed__QUERY$(x) {
+  /* passed? infintestimal.sibilant:39:0 */
+
+  return x.substr(0, 10) === OK;
+});
 var countPassed = (function countPassed$(acc, x) {
-  /* count-passed infintestimal.sibilant:39:0 */
+  /* count-passed infintestimal.sibilant:43:0 */
 
   return (function() {
-    if (x.substr(0, 10) === OK) {
+    if (passed__QUERY(x)) {
       return (1 + acc);
     } else {
       return acc;
@@ -69,30 +74,30 @@ var countPassed = (function countPassed$(acc, x) {
   }).call(this);
 });
 var zip = (function zip$(a, b) {
-  /* zip infintestimal.sibilant:44:0 */
+  /* zip infintestimal.sibilant:48:0 */
 
   return a.map((function(item, index) {
-    /* infintestimal.sibilant:47:9 */
+    /* infintestimal.sibilant:51:9 */
 
     return [ item, b[index] ];
   }));
 });
 var wrapIfSync = (function wrapIfSync$(f) {
-  /* wrap-if-sync infintestimal.sibilant:49:0 */
+  /* wrap-if-sync infintestimal.sibilant:53:0 */
 
   return (function() {
     if (0 === f.length) {
       return (function(cb) {
-        /* infintestimal.sibilant:52:4 */
+        /* infintestimal.sibilant:56:4 */
 
         return cb(null, f());
       });
     } else {
       return (function(cb) {
-        /* infintestimal.sibilant:54:4 */
+        /* infintestimal.sibilant:58:4 */
 
         return f((function(results) {
-          /* infintestimal.sibilant:54:15 */
+          /* infintestimal.sibilant:58:15 */
 
           return cb(null, results);
         }));
@@ -100,39 +105,41 @@ var wrapIfSync = (function wrapIfSync$(f) {
     }
   }).call(this);
 });
+var reporter = (function reporter$(testResult) {
+  /* reporter infintestimal.sibilant:60:0 */
+
+  return (function() {
+    if (passed__QUERY(testResult[0])) {
+      return console.log((testResult[0] + " " + testResult[1]));
+    } else {
+      return console.log((testResult[0].substr(0, 10) + " " + testResult[1] + testResult[0].substr(10)));
+    }
+  }).call(this);
+});
 var testRunner = (function testRunner$(tests) {
-  /* test-runner infintestimal.sibilant:57:0 */
+  /* test-runner infintestimal.sibilant:67:0 */
 
   console.log("Running tests... \n");
   var testFns = tests.map((function(x) {
-    /* infintestimal.sibilant:59:27 */
+    /* infintestimal.sibilant:69:27 */
 
     return wrapIfSync(x[1]);
   })),
       testNames = tests.map((function(x) {
-    /* infintestimal.sibilant:60:29 */
+    /* infintestimal.sibilant:70:29 */
 
     return x[0];
   }));
   return async.parallel(testFns, (function(err, results) {
-    /* infintestimal.sibilant:61:27 */
+    /* infintestimal.sibilant:71:27 */
 
     return (function() {
       if (err) {
         return console.log("Error:", err);
       } else {
-        zip(results, testNames).map((function(x) {
-          /* infintestimal.sibilant:68:21 */
-
-          return (x[0] + " " + x[1]);
-        })).map((function(x) {
-          /* infintestimal.sibilant:69:21 */
-
-          return console.log(x);
-        }));
+        zip(results, testNames).map(reporter);
         var succeeded = results.reduce(countPassed, 0),
             failed = (results.length - succeeded);
-        console.log("first result", results[0]);
         return console.log(("\n" + succeeded + " tests passed, " + failed + " failed"));
       }
     }).call(this);
